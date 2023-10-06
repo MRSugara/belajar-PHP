@@ -93,7 +93,7 @@
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="#">
                 <span data-feather="home" class="align-text-bottom"></span>
-                Dashboard
+                Landing
               </a>
             </li>
             <li class="nav-item">
@@ -108,13 +108,13 @@
                 Products
               </a>
             </li>
-            <!--   <li class="nav-item">
-                <a class="nav-link" href="#">
+            <li class="nav-item">
+                <a class="nav-link" href="pages/dashboard.php">
                   <span data-feather="users" class="align-text-bottom"></span>
-                  Customers
+                  Dashboard
                 </a>
               </li>
-              <li class="nav-item">
+              <!--   <li class="nav-item">
                 <a class="nav-link" href="#">
                   <span
                     data-feather="bar-chart-2"
