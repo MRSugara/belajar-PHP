@@ -11,8 +11,7 @@
 
   <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/dashboard/" />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 
   <style>
     .bd-placeholder-img {
@@ -23,9 +22,10 @@
       user-select: none;
     }
 
-    <blade media|%20(min-width%3A%20768px)%20%7B%0D>.bd-placeholder-img-lg {
-      font-size: 3.5rem;
-    }
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
     }
 
     .b-example-divider {
@@ -74,12 +74,10 @@
 <body>
   <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">Company name</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-      data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search"
-      aria-label="Search" />
+    <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search" aria-label="Search" />
     <!-- <div class="navbar-nav">
         <div class="nav-item text-nowrap">
           <a class="nav-link px-3" href="#">Sign out</a>
@@ -95,7 +93,7 @@
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="../index.php">
                 <span data-feather="home" class="align-text-bottom"></span>
-                Landing
+                Dashboard
               </a>
             </li>
             <li class="nav-item">
@@ -110,13 +108,13 @@
                 Products
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="dashboard.php">
-                <span data-feather="users" class="align-text-bottom"></span>
-                Dashboard
-              </a>
-            </li>
             <!--   <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="users" class="align-text-bottom"></span>
+                  Customers
+                </a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="#">
                   <span
                     data-feather="bar-chart-2"
@@ -186,8 +184,7 @@
       </nav>
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div
-          class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Products</h1>
           <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
@@ -205,25 +202,35 @@
           </div>
         </div>
         <div class="row justify-content-center" id="card">
+          <?php
+          $products = [
+            ["img" => "../assets/img/aoc.png", "title" => "aoc", "price" => "Rp.2.000.000"],
+            ["img" => "../assets/img/koorui.jpeg", "title" => "koorui", "price" => "Rp.1.600.000"],
+            ["img" => "../assets/img/asus249qgr.jpeg", "title" => "asus", "price" => "Rp.2.200.000"],
+            ["img" => "../assets/img/download.jpeg", "title" => "samsung", "price" => "Rp.2.000.000"],
+            ["img" => "../assets/img/samsungcr24f390.jpeg", "title" => "Samsung CR24f390", "price" => "Rp.2.100.000"],
+            ["img" => "../assets/img/samsungsr35.jpeg", "title" => "Samsung SR35", "price" => "Rp.3.800.000"],
+            ["img" => "../assets/img/samsung.jpg", "title" => "Samsung", "price" => "Rp.1.200.000"],
+            ["img" => "../assets/img/msig241vc.jpeg", "title" => "MSI G241VC", "price" => "Rp.1.950.000"],
+            ["img" => "../assets/img/aoc24eg2e5.jpeg", "title" => "AOC 24EG2E5", "price" => "Rp.1.650.000"]
+          ];
+          foreach ($products as $key => $value) {
+            echo "<div class='card m-2' style='width: 18rem;'> <img src='{$value["img"]}' class='card-img-top mt-2' alt='...''> <div class='card-body col-12 text-align-center'> <h5 class='card-title text-center'> {$value["title"]}</h5> <p class='card-text text-center'>{$value["price"]}</p> </div> </div> ";
+          }
+          ?>
         </div>
-
       </main>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"
-    integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous">
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"
-    integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous">
   </script>
   <script src="../assets/js/dashboard.js"></script>
-  <script src="../assets/js/product.js"></script>
-
 </body>
 
 </html>
