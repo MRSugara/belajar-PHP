@@ -114,6 +114,12 @@
                 Dashboard
               </a>
             </li>
+            <li class="nav-item">
+                            <a class="nav-link" href="CRUDproduct.php">
+                                <span data-feather="shopping-cart" class="align-text-bottom"></span>
+                                CRUDProducts
+                            </a>
+                        </li>
             <!--   
               <li class="nav-item">
                 <a class="nav-link" href="#">
