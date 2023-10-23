@@ -69,7 +69,6 @@
 
     <!-- Custom styles for this template -->
     <link href="../assets/css/dashboard.css" rel="stylesheet" />
-    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -190,7 +189,26 @@
                 <div class="card mb-4">
                     <div class="card-body">
 
-                        <table class="table table-striped table-sm" id="dataTable">
+                        <table class="table table-striped table-sm">
+                            <div class="col-12 d-flex justify-content-between">
+                                <div>
+
+                                </div>
+                                <div class="col-3 d-flex">
+                                    <form action="<?php echo $_SERVER["PHP_SELF"];?>" method="post" >
+                                        <?php
+                                            $kata_kunci="";
+                                            if (isset($_POST['kata_kunci'])) {
+                                                $kata_kunci=$_POST['kata_kunci'];
+                                            }
+                                        ?>
+                                        <input type="text" name="kata_kunci" value="<?php echo $kata_kunci;?>"
+                                            class="form-control mx-2" placeholder="Cari...">
+                                            <button type="submit" name="cari" class="btn btn-primary mx-2">Cari</button>
+                                </form>
+                                </div>
+                                
+                            </div>
                             <thead>
                                 <tr>
                                     <th scope="col">id</th>
@@ -201,12 +219,33 @@
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
+                            <?php  
+                            $limit = 3;
+                            $page = isset($_GET['halaman'])?(int)$_GET['halaman'] : 1;
+                            $halaman_awal = ($page>1) ? ($page * $limit) - $limit : 0;	
+                    
+                            $previous = $page - 1;
+                            $next = $page + 1;
+                            
+                            $data = mysqli_query($mysqli,"select * from products");
+                            $jumlah_data = mysqli_num_rows($data);
+                            $total_halaman = ceil($jumlah_data / $limit);
+                            
+                            $data_product = "select * from products limit $halaman_awal, $limit";
+                            $nomor = $halaman_awal+1;
+
+                            if (isset($_POST['kata_kunci'])) {
+                            $kata_kunci=trim($_POST['kata_kunci']);
+                            $sql="SELECT * FROM products WHERE category_id LIKE '%".$kata_kunci."%' OR product_name LIKE '%".$kata_kunci."%' OR product_code LIKE '%".$kata_kunci."%'";
+                            }else {
+                            $sql=$data_product;
+                            }
+                        ?>
                             <tbody>
-                                <?php 
-                                $query_mysql = mysqli_query($mysqli, "SELECT * FROM products")or die(mysqli_error($mysqli));
-                                $nomor = 1;
-                                while($data = mysqli_fetch_array($query_mysql)){
-                                ?>
+                            <?php
+                    $result=mysqli_query($mysqli,$sql);
+                    while ($data=mysqli_fetch_assoc($result)) {
+                    ?>
                                 <tr>
                                     <td><?php echo $nomor++; ?></td>
                                     <td><?php echo $data['product_name']; ?></td>
@@ -214,26 +253,36 @@
                                     <td><?php echo $data['is_active']; ?></td>
                                     <td><?php echo $data['product_code']; ?></td>
                                     <td>
-                                        <a href="update.php?id=<?php echo $data['id']; ?>" class="badge bg-warning" ><span
-                                                data-feather="edit"></span></a>
-                                        <a href="delete.php?id=<?php echo $data['id']; ?>" class="badge bg-danger"><span data-feather="trash-2"></span></a>
+                                        <a href="update.php?id=<?php echo $data['id']; ?>"
+                                            class="badge bg-warning"><span data-feather="edit"></span></a>
+                                        <a href="delete.php?id=<?php echo $data['id']; ?>" class="badge bg-danger"><span
+                                                data-feather="trash-2"></span></a>
                                     </td>
                                 </tr>
                                 <?php } ?>
                             </tbody>
                         </table>
+                        <ul class="pagination pt-3 justify-content-end">
+                    <li class="page-item">
+                      <a class="page-link" <?php if($page > 1){ echo "href='?halaman=$previous'"; } ?>>Previous</a>
+                    </li>
+                    <?php 
+                    for($x=1;$x<=$total_halaman;$x++){
+                      ?> 
+                      <li class="page-item"><a class="page-link" href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
+                      <?php
+                    }
+                    ?>				
+                    <li class="page-item">
+                      <a  class="page-link" <?php if($page < $total_halaman) { echo "href='?halaman=$next'"; } ?>>Next</a>
+                    </li>
+                  </ul>
 
                     </div>
                 </div>
             </main>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
-        integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
         feather.replace();
     </script>
