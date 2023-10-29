@@ -81,11 +81,11 @@
         </button>
         <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search"
             aria-label="Search" />
-        <!-- <div class="navbar-nav">
-        <div class="nav-item text-nowrap">
-          <a class="nav-link px-3" href="#">Sign out</a>
+        <div class="navbar-nav">
+            <div class="nav-item text-nowrap">
+                <a class="nav-link px-3" href="logout.php">Sign out</a>
+            </div>
         </div>
-      </div> -->
     </header>
 
     <div class="container-fluid">
@@ -143,7 +143,7 @@
                 </div>
                 <div class="card mb-4 col-4">
                     <div class="card-body">
-                        <form action="" method="POST">
+                        <form action="" method="POST" enctype="multipart/form-data">
 
                             <div class="mb-3">
                                 <label for="product_name" class="form-label">Nama Produk</label>
@@ -175,14 +175,70 @@
 
                                 </select>
                             </div>
+                            <div class="mb-3">
+                                <label for="gambar" class="form-label">Gambar</label>
+                                <?php
+                                        if (isset($data) && isset($data['image'])) {
+                                        $gambarArray = json_decode($data['image']);
+                                        foreach ($gambarArray as $gambar) {
+                                            echo '<img src="../assets/img/gambar/' . $gambar . '" width="50" alt="gambar"><br>';
+                                        }
+                                        }
+                                    ?>
+                                <input type="file" name="gambar[]" id="gambar" multiple>
+                            </div>
                             <button type="submit" name="submit" class="btn btn-primary m-2">Create data</button>
                         </form>
                         <?php
 
                             if (isset($_POST['submit'])) {
-                                mysqli_query($mysqli, "INSERT INTO products set product_name ='$_POST[product_name]',category_id='$_POST[category_id]',product_code='$_POST[product_code]',is_active='$_POST[is_active]'") or die(mysqli_error($mysqli));
+                                $namaProduct = $_POST["product_name"];
+                                $kategoriProduct = $_POST["category_id"];
+                                $kodeProduct = $_POST["product_code"];
+                                $is_active = $_POST["is_active"];
+                                $gambar = upload();
+                              
+                                mysqli_query($mysqli, "INSERT INTO products (product_name, category_id, product_code, is_active , image) VALUES ('$namaProduct', '$kategoriProduct', '$kodeProduct','$is_active', '$gambar')");
 
                             }
+                            function upload(){
+                                $gambarArray = array();
+                                $files = $_FILES['gambar'];
+                              
+                                foreach($files['name'] as $key => $namaFile) {
+                                  $ukuranFile = $files['size'][$key];
+                                  $error = $files['error'][$key];
+                                  $tmpName = $files['tmp_name'][$key];
+                              
+                                  if ($error === 4) {
+                                    continue; 
+                                  }
+                              
+                                  $ekstensiGambarValid = ['jpg', 'jpeg', 'png'];
+                                  $ekstensiGambar = pathinfo($namaFile, PATHINFO_EXTENSION);
+                                  $ekstensiGambar = strtolower($ekstensiGambar);
+                              
+                                  if (!in_array($ekstensiGambar, $ekstensiGambarValid)) {
+                                    echo "<script>
+                                            alert('Gambar $namaFile bukan file gambar (jpg, jpeg, png)'); 
+                                          </script>";
+                                    continue;
+                                  }
+                              
+                                  if ($ukuranFile > 1000000) {
+                                    echo "<script>
+                                            alert('Gambar $namaFile terlalu besar!'); 
+                                          </script>";
+                                    continue;
+                                  }
+                              
+                                  $namaFileBaru = uniqid() . '.' . $ekstensiGambar;
+                                  move_uploaded_file($tmpName, '../assets/img/gambar/' . $namaFileBaru);
+                                  $gambarArray[] = $namaFileBaru;
+                                }
+                              
+                                return json_encode($gambarArray);
+                              }
                         ?>
                     </div>
                 </div>
@@ -195,7 +251,7 @@
 
                                 </div>
                                 <div class="col-3 d-flex">
-                                    <form action="<?php echo $_SERVER["PHP_SELF"];?>" method="post" >
+                                    <form action="<?php echo $_SERVER["PHP_SELF"];?>" method="post">
                                         <?php
                                             $kata_kunci="";
                                             if (isset($_POST['kata_kunci'])) {
@@ -204,10 +260,10 @@
                                         ?>
                                         <input type="text" name="kata_kunci" value="<?php echo $kata_kunci;?>"
                                             class="form-control mx-2" placeholder="Cari...">
-                                            <button type="submit" name="cari" class="btn btn-primary mx-2">Cari</button>
-                                </form>
+                                        <button type="submit" name="cari" class="btn btn-primary mx-2">Cari</button>
+                                    </form>
                                 </div>
-                                
+
                             </div>
                             <thead>
                                 <tr>
@@ -216,6 +272,8 @@
                                     <th scope="col">kategori</th>
                                     <th scope="col">Keaktifan</th>
                                     <th scope="col">Code Product</th>
+                                    <th scope="col">Gambar</th>
+
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -230,8 +288,11 @@
                             $data = mysqli_query($mysqli,"select * from products");
                             $jumlah_data = mysqli_num_rows($data);
                             $total_halaman = ceil($jumlah_data / $limit);
-                            
-                            $data_product = "select * from products limit $halaman_awal, $limit";
+                            $sortingColumn = "products.id";
+                            $data_product = "SELECT products.*, product_categories.category_name AS category_name 
+                            FROM products 
+                            INNER JOIN product_categories ON products.category_id = product_categories.id 
+                            ORDER BY $sortingColumn limit $halaman_awal, $limit";
                             $nomor = $halaman_awal+1;
 
                             if (isset($_POST['kata_kunci'])) {
@@ -242,16 +303,33 @@
                             }
                         ?>
                             <tbody>
-                            <?php
-                    $result=mysqli_query($mysqli,$sql);
-                    while ($data=mysqli_fetch_assoc($result)) {
-                    ?>
+                                <?php
+                                $result=mysqli_query($mysqli,$sql);
+                                while ($data=mysqli_fetch_assoc($result)) {
+                                ?>
                                 <tr>
                                     <td><?php echo $nomor++; ?></td>
                                     <td><?php echo $data['product_name']; ?></td>
-                                    <td><?php echo $data['category_id']; ?></td>
-                                    <td><?php echo $data['is_active']; ?></td>
+                                    <td><?php echo $data['category_name']; ?></td>
+                                    <td><?php if($data['is_active']){
+                                        echo "Aktif";
+                                    }else{
+                                        echo "Tidak Aktif";
+                                    } ?></td>
                                     <td><?php echo $data['product_code']; ?></td>
+                                    <td>
+                                        <?php
+                                        $gambarArray = json_decode($data["image"]);
+                                            if ($gambarArray !== null && is_array($gambarArray)) {
+                                            foreach ($gambarArray as $gambar) {
+                                                echo '<img src="../assets/img/gambar/' . $gambar . '" alt="gambar" width=80><br>';
+                                            }
+                                            }
+                                        
+                                            
+                                        ?>
+
+                                    </td>
                                     <td>
                                         <a href="update.php?id=<?php echo $data['id']; ?>"
                                             class="badge bg-warning"><span data-feather="edit"></span></a>
@@ -263,20 +341,23 @@
                             </tbody>
                         </table>
                         <ul class="pagination pt-3 justify-content-end">
-                    <li class="page-item">
-                      <a class="page-link" <?php if($page > 1){ echo "href='?halaman=$previous'"; } ?>>Previous</a>
-                    </li>
-                    <?php 
+                            <li class="page-item">
+                                <a class="page-link"
+                                    <?php if($page > 1){ echo "href='?halaman=$previous'"; } ?>>Previous</a>
+                            </li>
+                            <?php 
                     for($x=1;$x<=$total_halaman;$x++){
-                      ?> 
-                      <li class="page-item"><a class="page-link" href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
-                      <?php
+                      ?>
+                            <li class="page-item"><a class="page-link"
+                                    href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
+                            <?php
                     }
-                    ?>				
-                    <li class="page-item">
-                      <a  class="page-link" <?php if($page < $total_halaman) { echo "href='?halaman=$next'"; } ?>>Next</a>
-                    </li>
-                  </ul>
+                    ?>
+                            <li class="page-item">
+                                <a class="page-link"
+                                    <?php if($page < $total_halaman) { echo "href='?halaman=$next'"; } ?>>Next</a>
+                            </li>
+                        </ul>
 
                     </div>
                 </div>

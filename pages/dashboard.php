@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<?php
+session_start();
+
+
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php'); 
+    exit();
+}
+?>
 
 <head>
   <meta charset="utf-8" />
@@ -11,7 +20,8 @@
 
   <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/dashboard/" />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 
   <style>
     .bd-placeholder-img {
@@ -22,11 +32,10 @@
       user-select: none;
     }
 
-    @media (min-width: 768px) {
-      .bd-placeholder-img-lg {
-        font-size: 3.5rem;
-      }
+    <blade media|%20(min-width%3A%20768px)%20%7B%0D>.bd-placeholder-img-lg {
+      font-size: 3.5rem;
     }
+
 
     .b-example-divider {
       height: 3rem;
@@ -74,15 +83,17 @@
 <body>
   <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">Company name</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+      data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search" aria-label="Search" />
-    <!-- <div class="navbar-nav">
-        <div class="nav-item text-nowrap">
-          <a class="nav-link px-3" href="#">Sign out</a>
+    <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search"
+      aria-label="Search" />
+      <div class="navbar-nav">
+            <div class="nav-item text-nowrap">
+                <a class="nav-link px-3" href="logout.php">Sign out</a>
+            </div>
         </div>
-      </div> -->
   </header>
 
   <div class="container-fluid">
@@ -115,11 +126,11 @@
               </a>
             </li>
             <li class="nav-item">
-                            <a class="nav-link" href="CRUDproduct.php">
-                                <span data-feather="shopping-cart" class="align-text-bottom"></span>
-                                CRUDProducts
-                            </a>
-                        </li>
+              <a class="nav-link" href="CRUDproduct.php">
+                <span data-feather="shopping-cart" class="align-text-bottom"></span>
+                CRUDProducts
+              </a>
+            </li>
             <!--   
               <li class="nav-item">
                 <a class="nav-link" href="#">
@@ -189,10 +200,33 @@
             </ul> -->
         </div>
       </nav>
+      <?php
+          include 'koneksi.php'; 
+          function tanggal() {
+            date_default_timezone_set('Asia/Jakarta'); 
+            $hari = date('l'); 
+            $tanggal_waktu = date('Y-m-d H:i:s');
+            $hari_indonesia = [
+                'Sunday' => 'Minggu',
+                'Monday' => 'Senin',
+                'Tuesday' => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis',
+                'Friday' => 'Jumat',
+                'Saturday' => 'Sabtu'
+            ];
+        
+            $hari = $hari_indonesia[$hari];
+            return $hari . ', ' . date('d F Y H:i:s', strtotime($tanggal_waktu));
+        }
+        $hasil_tanggal = tanggal();
+        
 
+      ?>
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-          <h1 class="h2">Products</h1>
+        <div
+          class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2" st><?php echo $hasil_tanggal?></h1>
           <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
               <button type="button" class="btn btn-sm btn-outline-secondary">
@@ -208,19 +242,77 @@
             </button>
           </div>
         </div>
-        <div class="row justify-content-center" id="card">
+        <?php
+          $queryProduct = $mysqli->query('SELECT COUNT(*) as count FROM products');
+          $productCount = $queryProduct->fetch_assoc()['count'];
+          
+          $queryCustomer = $mysqli->query('SELECT COUNT(*) as count FROM customers');
+          $customerCount = $queryCustomer->fetch_assoc()['count'];
+
+          $queryVendor = $mysqli->query('SELECT COUNT(*) as count FROM vendors');
+          $vendorCount = $queryVendor->fetch_assoc()['count'];
+          ?>
+        <div class="row">
+          <div class="card text-bg-primary mx-2" style="width: 25rem;">
+            <div class="d-flex card-body justify-content-between">
+              <div class="card-text">
+                <h2><?php echo $productCount; ?></h3>
+                  <p class="fs-5">Products</p>
+              </div>
+              <div class="pt-3 px-2">
+                <span data-feather="shopping-cart" class="align-text-bottom secondary"
+                  style="width:50px;height:50px;"></span>
+              </div>
+            </div>
+            <div class="card-footer d-flex justify-content-center">
+              <a href="CRUDproduct.php" class="nav-link ">More Info</a>
+            </div>
+          </div>
+          <div class="card text-bg-success mx-2" style="width: 25rem;">
+            <div class="d-flex card-body justify-content-between">
+              <div class="card-text">
+                <h2><?php echo $customerCount; ?></h3>
+                  <p class="fs-5">Customer</p>
+              </div>
+              <div class="pt-3 px-2">
+                <span data-feather="bar-chart" class="align-text-bottom secondary"
+                  style="width:50px;height:50px;"></span>
+              </div>
+            </div>
+            <div class="card-footer d-flex justify-content-center">
+              <a href="CRUDproduct.php" class="nav-link ">More Info</a>
+            </div>
+          </div>
+          <div class="card text-bg-warning mx-2" style="width: 25rem;">
+            <div class="d-flex card-body justify-content-between">
+              <div class="card-text">
+                <h2><?php echo $vendorCount; ?></h3>
+                  <p class="fs-5">Vendor</p>
+              </div>
+              <div class="pt-3 px-2">
+                <span data-feather="user-plus" class="align-text-bottom secondary"
+                  style="width:50px;height:50px;"></span>
+              </div>
+            </div>
+            <div class="card-footer d-flex justify-content-center">
+              <a href="CRUDproduct.php" class="nav-link ">More Info</a>
+            </div>
+          </div>
         </div>
 
       </main>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"
+    integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous">
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"
+    integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous">
   </script>
   <script src="../assets/js/dashboard.js"></script>
   <script src="../assets/js/product.js"></script>

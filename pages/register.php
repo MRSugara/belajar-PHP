@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
-    <?php
+<?php
         session_start();
+
         if (isset($_SESSION['username'])) {
             header('Location: dashboard.php'); 
             exit();
@@ -16,6 +17,10 @@
     <title>Signin Template · Bootstrap v5.3</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/">
+
+
+
+
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
@@ -32,6 +37,7 @@
         <blade media|%20(min-width%3A%20768px)%20%7B%0D>.bd-placeholder-img-lg {
             font-size: 3.5rem;
         }
+
 
         .b-example-divider {
             height: 3rem;
@@ -79,25 +85,29 @@
 <body class="text-center">
 
     <main class="form-signin w-100 m-auto">
-        <form action="login_logic.php" method="POST" >
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+        <form method="POST" action="register_logic.php">
+            <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
 
             <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" name="email" placeholder="Username">
+                <input type="text" class="form-control" id="floatingInput" name="name" placeholder="Username">
+                <label for="floatingInput">Username</label>
+            </div>
+            <div class="form-floating">
+                <input type="email" class="form-control" id="floatingInput" name="email" placeholder="Email">
                 <label for="floatingInput">Email</label>
+            </div>
+            <div class="form-floating">
+                <input type="tel" class="form-control" id="floatingInput" name="phone_number" placeholder="No. Handphone">
+                <label for="floatingInput">NO. Handphone</label>
             </div>
             <div class="form-floating">
                 <input type="password" name="password" class="form-control" id="floatingPassword"
                     placeholder="Password">
                 <label for="floatingPassword">Password</label>
             </div>
-            <div class="d-grid">
-                <button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Sign
-                    In</button>
-                <br>
-                <a href="register.php">Register Now</a>
-            </div>
-            <p class="mt-2 mb-3 text-muted">&copy; 2017–2022</p>
+
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+            <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p>
         </form>
     </main>
 

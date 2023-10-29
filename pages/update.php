@@ -82,11 +82,11 @@
         </button>
         <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search"
             aria-label="Search" />
-        <!-- <div class="navbar-nav">
-        <div class="nav-item text-nowrap">
-          <a class="nav-link px-3" href="#">Sign out</a>
+            <div class="navbar-nav">
+            <div class="nav-item text-nowrap">
+                <a class="nav-link px-3" href="logout.php">Sign out</a>
+            </div>
         </div>
-      </div> -->
     </header>
 
     <div class="container-fluid">
@@ -135,28 +135,22 @@
                 </div>
                 <button type="submit" name="submit" class="btn btn-primary mb-3">Kembali</button>
                 <?php
-                    // include database connection file
                     include "koneksi.php";
                     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                        // Get the form data
                         $product_id = $_POST["id"];
                         $product_name = $_POST["product_name"];
                         $category_id = $_POST["category_id"];
                         $code = $_POST["product_code"];
 
-                        // Update the data in the database
                         $sql = "UPDATE products SET product_name='$product_name', category_id='$category_id', product_code='$code'WHERE id='$product_id'";
                         if (mysqli_query($mysqli, $sql)) {
                           echo "<script> window.location.href='CRUDproduct.php'</script>";
-
                         //   header('location:CRUDproduct.php');
-                          
                         } 
                       }
 
                     $id = $_GET['id'];
 
-                    // Fetech user data based on id
                     $result = mysqli_query($mysqli, "SELECT * FROM products WHERE id=$id");
 
                     while ($user_data = mysqli_fetch_array($result)) {
@@ -164,7 +158,6 @@
                         $code = $user_data['product_code'];
                         $category = $user_data['category_id'];
                         $active = $user_data['is_active'];
-
                     }
                     ?>
                 <div class="card mb-4">
@@ -211,8 +204,6 @@
                              ?>>
                             <button type="submit" name="update" class="btn btn-primary m-2">Update data</button>
                         </form>
-
-
                     </div>
                 </div>
             </main>
