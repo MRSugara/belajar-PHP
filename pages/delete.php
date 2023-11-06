@@ -1,14 +1,25 @@
 <?php
-include "koneksi.php";
-$id = $_GET['id'];
-$sql = "DELETE FROM products WHERE id=$id";
+    include 'conn.php';
+    include 'product_OOP.php';
 
-if ($mysqli->query($sql) === TRUE) {
-  echo "Record deleted successfully";
-  header("location:CRUDproduct.php");
+$database = new Database();
+$connection = $database->getConnection();
+
+$product = new Product($connection);
+
+if (isset($_GET['id'])) {
+    $product_id = $_GET['id'];
+    
+    if ($product->deleteProduct($product_id)) {
+        header("Location: CRUDproduct.php");
+        exit;
+    } else {
+        echo "Error: Gagal menghapus produk.";
+    }
 } else {
-  echo "Error deleting record: " . $mysqli->error;
+    echo "ID Produk tidak ditemukan.";
 }
 
-
-$mysqli->close();
+// Tutup koneksi database
+$database->closeConnection();
+?>

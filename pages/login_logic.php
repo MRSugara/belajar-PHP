@@ -1,27 +1,28 @@
 <?php
-session_start(); 
+session_start();
+include 'conn.php';
+include 'user.php';
 
-include 'koneksi.php';
+$database = new Database();
+$connection = $database->getConnection();
 
-$email = $_POST['email'];
+$user = new User($connection);
+
+$username = $_POST['username'];
 $password = $_POST['password'];
 
+$storedUser = $user->login($username);
 
-$sql = "SELECT * FROM users WHERE email = '$email'";
-$result = $mysqli->query($sql);
+if ($storedUser) {
+    $stored_password = $storedUser['password'];
 
-if ($result->num_rows == 1) {
-    $row = $result->fetch_assoc();
-    if (password_verify($password, $row['password'])) {
-        $_SESSION['username'] = $row['username'];
-        header('Location: dashboard.php'); 
+    if ($password === $stored_password || password_verify($password, $stored_password)) {
+        $_SESSION['username'] = $username;
+        header("Location: dashboard.php");
         exit();
-    }
-}
+    } 
+} 
 
-$_SESSION['login_error'] = 'Email atau password salah'; 
-header('Location: login.php'); 
-exit();
-
-$mysqli->close();
+// Tutup koneksi database
+$database->closeConnection();
 ?>

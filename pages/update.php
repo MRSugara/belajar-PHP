@@ -1,5 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+<?php
+// Koneksi ke database
+include 'koneksi.php';
+if (isset($_GET['id'])) {
+    $product_id = $_GET['id'];
+
+    if ($mysqli->connect_error) {
+        die("Koneksi gagal: " . $mysqli->connect_error);
+    }
+
+    // Query untuk mengambil data produk berdasarkan 'id'
+    $sql = "SELECT id, product_name, category_id, product_code, description, price, stock, image FROM products WHERE id = $product_id";
+    $result = $mysqli->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $product_id = $row['id'];
+        $product_name = $row['product_name'];
+        $category_id = $row['category_id'];
+        $product_code = $row['product_code'];
+        $image = $row['image'];
+
+    } else {
+        echo "Produk tidak ditemukan.";
+    }
+    $mysqli->close();
+} else {
+    echo "ID Produk tidak ditemukan.";
+}
+?>
 
 <head>
     <meta charset="utf-8" />
@@ -23,9 +53,6 @@
             user-select: none;
         }
 
-        <blade media|%20(min-width%3A%20768px)%20%7B%0D>.bd-placeholder-img-lg {
-            font-size: 3.5rem;
-        }
 
 
         .b-example-divider {
@@ -82,7 +109,7 @@
         </button>
         <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search"
             aria-label="Search" />
-            <div class="navbar-nav">
+        <div class="navbar-nav">
             <div class="nav-item text-nowrap">
                 <a class="nav-link px-3" href="logout.php">Sign out</a>
             </div>
@@ -134,57 +161,28 @@
                     <h1 class="h2">Edit Product</h1>
                 </div>
                 <button type="submit" name="submit" class="btn btn-primary mb-3">Kembali</button>
-                <?php
-                    include "koneksi.php";
-                    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                        $product_id = $_POST["id"];
-                        $product_name = $_POST["product_name"];
-                        $category_id = $_POST["category_id"];
-                        $code = $_POST["product_code"];
-
-                        $sql = "UPDATE products SET product_name='$product_name', category_id='$category_id', product_code='$code'WHERE id='$product_id'";
-                        if (mysqli_query($mysqli, $sql)) {
-                          echo "<script> window.location.href='CRUDproduct.php'</script>";
-                        //   header('location:CRUDproduct.php');
-                        } 
-                      }
-
-                    $id = $_GET['id'];
-
-                    $result = mysqli_query($mysqli, "SELECT * FROM products WHERE id=$id");
-
-                    while ($user_data = mysqli_fetch_array($result)) {
-                        $name = $user_data['product_name'];
-                        $code = $user_data['product_code'];
-                        $category = $user_data['category_id'];
-                        $active = $user_data['is_active'];
-                    }
-                    ?>
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form action="" method="POST">
+                        <form action="edit.php" method="POST">
 
                             <div class="mb-3">
                                 <label for="product_name" class="form-label">Nama Produk</label>
-                                <input type="input" class="form-control" id="product_name" name="product_name" value=<?php echo $name; ?> autofocus
-                                    autocomplete="off" required>
+                                <input type="input" class="form-control" id="product_name" name="product_name"
+                                    value="<?php echo $product_name; ?>" autofocus autocomplete="off" required>
                             </div>
                             <div class="mb-3">
-                                <label for="category_id" class="form-label">Kategori</label>
-                                <select class="form-select" id="category_id" name="category_id">
-                                <?php
-                                    include 'koneksi.php';
-                                    $query_create = mysqli_query($mysqli, "SELECT * FROM product_categories") or die(mysqli_error($mysqli));
-                                    while ($data = mysqli_fetch_array($query_create)) {
-                                        echo "<option value=$data[id]> $data[category_name] </option>";
-                                    }
-                                ?>  
+                                <label for="category_id">Category:</label>
+                                <select id="category_id" name="category_id" class="form-control" required>
+                                    <option value="1" <?php if ($category_id == 1) echo 'selected'; ?>>Sports</option>
+                                    <option value="2" <?php if ($category_id == 2) echo 'selected'; ?>>Daily</option>
+                                    <option value="3" <?php if ($category_id == 3) echo 'selected'; ?>>Accessories
+                                    </option>
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <label for="product_code" class="form-label">Kode Produk</label>
                                 <input type="input" class="form-control" id="product_code" name="product_code"
-                                    autocomplete="off" required value=<?php echo $code; ?>>
+                                    autocomplete="off" required value="<?php echo $product_code; ?>">
                             </div>
                             <div class="mb-3">
                                 <label for="is_active" class="form-label">Keaktifan</label>
@@ -194,14 +192,28 @@
 
                                 </select>
                             </div>
-                            <input type="hidden" name="id" 
-                            value=<?php 
+                            <input type="hidden" name="id" value=<?php 
                             include "koneksi.php";
                             $coba = mysqli_query($mysqli, "SELECT * FROM products");
                                 while($data = mysqli_fetch_array($coba)){
                                     echo $data['id'];
                                 }
                              ?>>
+                            <div class="form-group">
+                                <label for="image">Update Image:</label>
+                                <input type="file" id="image" name="image[]" class="form-control"
+                                    accept=".jpg, .jpeg, .png, .gif" multiple><br>
+                                <div style="display: flex;">
+                                    <?php
+                                    $imagesArray = json_decode($image, true);
+                                    if (!empty($imagesArray)) {
+                                        foreach ($imagesArray as $img) {
+                                            echo '<img src="../assets/img/gambar/' . $img . '" alt="image" width="100" height="100" style="margin-right: 10px;"><br>';
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                            </div>
                             <button type="submit" name="update" class="btn btn-primary m-2">Update data</button>
                         </form>
                     </div>
